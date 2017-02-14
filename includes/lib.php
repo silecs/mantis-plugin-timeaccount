@@ -88,7 +88,7 @@ function convertHhmmToMinutes($hhmm)
  */
 function canCreditTime($projectId)
 {
-    return access_get_project_level((int) $projectId) >= config_get('manage_project_threshold');
+    return access_has_project_level(config_get('manage_project_threshold'), (int) $projectId);
 }
 
 /**
