@@ -8,12 +8,12 @@ namespace timeaccount;
 /**
  * Array of id, name, parent_id, timeused, tt.timecredit
  *
+ * @param int $projectId
  * @return IteratorAggregate
  */
-function readProjectsTime()
+function readProjectsTime($projectId)
 {
-    $projectId = helper_get_current_project();
-    if ($projectId == ALL_PROJECTS) {
+    if (empty($projectId) || $projectId == ALL_PROJECTS) {
         $projects = current_user_get_accessible_projects();
     } else {
         $projects = [(int) $projectId];
@@ -35,19 +35,19 @@ function readProjectsTime()
 }
 
 /**
- * Array of name, descriptin
+ * Array of id, name, timecredit, description
  *
+ * @param int $projectId
  * @return array
  */
-function readNameDescription()
+function readNameDescription($projectId)
 {
-    $projectId = helper_get_current_project();
-    if ($projectId == ALL_PROJECTS) {
-        return "";
+    if (empty($projectId) || $projectId == ALL_PROJECTS) {
+        return null;
     }
 
     $timetable = plugin_table('project');
-    $sql = "SELECT p.name, tt.description
+    $sql = "SELECT p.id, p.name, tt.timecredit, tt.description
         FROM {project} p
         LEFT JOIN $timetable tt ON tt.project_id = p.id
         WHERE p.id = " . (int) $projectId
@@ -57,5 +57,64 @@ function readNameDescription()
     if (db_num_rows($result) == 0) {
         return [];
     }
-    return $result->GetArray()[0];
+    $rows = $result->GetArray();
+    return $rows[0];
+}
+
+/**
+ * If the parameter contains no ':', then it implies a suffix ':00'.
+ *
+ * @param string $hhmm
+ * @return integer
+ */
+function convertHhmmToMinutes($hhmm)
+{
+    $m = [];
+    if (ctype_digit($hhmm)) {
+        return 60 * ((int) $hhmm);
+    } else if (preg_match('/^(\d+):(\d\d?)$/', $hhmm, $m)) {
+        return $m[1] * 60 + $m[2];
+    } else if (preg_match('/^(\d+\.\d\d?)$/', $hhmm, $m)) {
+        return (int) (((float) $m[1]) * 60);
+    } else {
+        // invalid format
+        return 0;
+    }
+}
+
+/**
+ * @param integer $projectId
+ * @return boolean
+ */
+function canCreditTime($projectId)
+{
+    return access_get_project_level((int) $projectId) >= config_get('manage_project_threshold');
+}
+
+/**
+ * @return boolean
+ */
+function addSessionMessage($category, $message)
+{
+    if (!isset($_SESSION['timeaccount_messages'])) {
+        $_SESSION['timeaccount_messages'] = [];
+    }
+    if (!isset($_SESSION['timeaccount_messages'][$category])) {
+        $_SESSION['timeaccount_messages'][$category] = [];
+    }
+    $_SESSION['timeaccount_messages'][$category][] = $message;
+    return true;
+}
+
+/**
+ * @return array
+ */
+function readSessionMessages()
+{
+    if (isset($_SESSION['timeaccount_messages'])) {
+        $messages = $_SESSION['timeaccount_messages'];
+        unset($_SESSION['timeaccount_messages']);
+        return $messages;
+    }
+    return [];
 }
