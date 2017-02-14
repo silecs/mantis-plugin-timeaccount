@@ -8,10 +8,17 @@ require_once dirname(__DIR__) . '/includes/lib.php';
 access_ensure_project_level(config_get('view_summary_threshold'));
 
 $timerows = \timeaccount\readProjectsTime();
+$descr = \timeaccount\readNameDescription();
 
 html_page_top();
 ?>
-<h1>Décompte du temps</h1>
+<h1><?= isset($descr['name']) ? $descr['name'] . ' — ' : '' ?>Décompte du temps</h1>
+
+<?php
+if (isset($descr['description'])) {
+    echo nl2br(htmlspecialchars($descr['description']));
+}
+?>
 
 <table>
    <thead>

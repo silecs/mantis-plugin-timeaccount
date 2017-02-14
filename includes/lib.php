@@ -21,7 +21,7 @@ function readProjectsTime()
     $ids = join(',', $projects);
 
     $timetable = plugin_table('project');
-    $query = "SELECT p.id, p.name, ph.parent_id, SUM(bn.time_tracking) AS timeused, tt.timecredit
+    $sql = "SELECT p.id, p.name, ph.parent_id, SUM(bn.time_tracking) AS timeused, tt.timecredit
             FROM {project} p
             LEFT JOIN {project_hierarchy} ph ON p.id = ph.child_id
             LEFT JOIN {bug} b ON b.project_id = p.id
@@ -31,5 +31,31 @@ function readProjectsTime()
             GROUP BY p.id
             ORDER BY p.name";
 
-    return db_query($query);
+    return db_query($sql);
+}
+
+/**
+ * Array of name, descriptin
+ *
+ * @return array
+ */
+function readNameDescription()
+{
+    $projectId = helper_get_current_project();
+    if ($projectId == ALL_PROJECTS) {
+        return "";
+    }
+
+    $timetable = plugin_table('project');
+    $sql = "SELECT p.name, tt.description
+        FROM {project} p
+        LEFT JOIN $timetable tt ON tt.project_id = p.id
+        WHERE p.id = " . (int) $projectId
+        ;
+    $result = db_query($sql);
+
+    if (db_num_rows($result) == 0) {
+        return [];
+    }
+    return $result->GetArray()[0];
 }
