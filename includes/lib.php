@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
  * @license http://www.gnu.org/licenses/gpl-3.0.html  GNU GPL v3
  */
 
@@ -51,7 +51,7 @@ function readNameDescription($projectId)
         FROM {project} p
         LEFT JOIN $timetable tt ON tt.project_id = p.id
         WHERE p.id = " . (int) $projectId
-        ;
+    ;
     $result = db_query($sql);
 
     if (db_num_rows($result) == 0) {

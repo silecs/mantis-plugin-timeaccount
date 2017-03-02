@@ -38,7 +38,7 @@ class TimeAccountPlugin extends MantisPlugin
             // first command
             [
                 'CreateTableSQL', // function name
-                [                 // function parameters
+                [// function parameters
                     plugin_table('project'),
                     "project_id INT UNSIGNED NOT NULL PRIMARY, "
                     . "timecredit INT UNSIGNED NOT NULL DEFAULT 0, "
@@ -49,26 +49,26 @@ class TimeAccountPlugin extends MantisPlugin
     }
 
     /**
-	 * Declare hooks on Mantis events.
+     * Declare hooks on Mantis events.
      *
-	 * @return array
-	 */
-	public function hooks()
+     * @return array
+     */
+    public function hooks()
     {
-		return [
-			'EVENT_MENU_SUMMARY' => 'onMenuSummary',
-		];
-	}
+        return [
+            'EVENT_MENU_SUMMARY' => 'onMenuSummary',
+        ];
+    }
 
-	/**
-	 * Add entries to the menu on the page "Summary".
+    /**
+     * Add entries to the menu on the page "Summary".
      *
-	 * @return array
-	 */
-	public function onMenuSummary()
+     * @return array
+     */
+    public function onMenuSummary()
     {
-		return [
+        return [
             '<a href="' . plugin_page('status') . '">Temps</a>',
         ];
-	}
+    }
 }

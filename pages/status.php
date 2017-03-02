@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
  * @license http://www.gnu.org/licenses/gpl-3.0.html  GNU GPL v3
  */
 
@@ -32,15 +32,15 @@ if ($flashMessages) {
 <div id="time-per-project" class="summary-container">
     <h2>Crédits de temps</h2>
     <table>
-       <thead>
-           <tr class="row-category">
-               <th>Projet</th>
-               <th>Temps consacré</th>
-               <th>Temps prépayé</th>
-               <th>Reste</th>
-           </tr>
-       </thead>
-       <tbody>
+        <thead>
+            <tr class="row-category">
+                <th>Projet</th>
+                <th>Temps consacré</th>
+                <th>Temps prépayé</th>
+                <th>Reste</th>
+            </tr>
+        </thead>
+        <tbody>
             <?php
             foreach ($timerows as $row) {
                 echo "<tr>";
@@ -55,7 +55,7 @@ if ($flashMessages) {
                 echo "</tr>\n";
             }
             ?>
-       </tbody>
+        </tbody>
     </table>
     <p>
         Les durées sont exprimées sous la forme <em>hh:mm</em> (heures et minutes).
@@ -66,8 +66,8 @@ if ($flashMessages) {
 if (isset($info['description'])) {
     echo "<h2>Détails</h2>";
     echo '<div id="project-info">'
-        . nl2br($info['description']) // no filter, but on purpose!
-        . "</div>\n";
+    . nl2br($info['description']) // no filter, but on purpose!
+    . "</div>\n";
 }
 ?>
 
@@ -77,34 +77,34 @@ if (isset($info['id']) && timeaccount\canCreditTime($info['id'])) {
     ?>
     <h2>Administation du crédit de temps</h2>
     <div class="form-container">
-    <form method="post" action="<?= plugin_page('update-project') ?>">
-        <fieldset>
-            <legend><?= htmlspecialchars($info['name']) ?></legend>
+        <form method="post" action="<?= plugin_page('update-project') ?>">
+            <fieldset>
+                <legend><?= htmlspecialchars($info['name']) ?></legend>
 
-            <input type="hidden" name="project_id" value="<?= $info['id'] ?>" />
+                <input type="hidden" name="project_id" value="<?= $info['id'] ?>" />
 
-            <div class="field-container">
-				<label><span>Crédit de temps</span></label>
-				<span class="input">
-					<input type="text" name="timecredit" value="<?= $credit ?>" />
-                    (hh:mm ou hh.h)
-				</span>
-				<span class="label-style"></span>
-			</div>
+                <div class="field-container">
+                    <label><span>Crédit de temps</span></label>
+                    <span class="input">
+                        <input type="text" name="timecredit" value="<?= $credit ?>" />
+                        (hh:mm ou hh.h)
+                    </span>
+                    <span class="label-style"></span>
+                </div>
 
-            <div class="field-container">
-                <label><span>Commentaire public</span><br />(HTML brut + nl2br)</label>
-				<span class="input">
-                    <textarea cols="74" rows="12" name="description"><?= htmlspecialchars($info['description']) ?></textarea>
-				</span>
-				<span class="label-style"></span>
-			</div>
+                <div class="field-container">
+                    <label><span>Commentaire public</span><br />(HTML brut + nl2br)</label>
+                    <span class="input">
+                        <textarea cols="74" rows="12" name="description"><?= htmlspecialchars($info['description']) ?></textarea>
+                    </span>
+                    <span class="label-style"></span>
+                </div>
 
-            <span class="submit-button">
-                <button type="submit" class="button">Enregistrer</button>
-            </span>
-        </fieldset>
-    </form>
+                <span class="submit-button">
+                    <button type="submit" class="button">Enregistrer</button>
+                </span>
+            </fieldset>
+        </form>
     </div>
     <?php
 }

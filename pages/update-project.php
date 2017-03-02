@@ -1,5 +1,5 @@
 <?php
-/* 
+/*
  * @license http://www.gnu.org/licenses/gpl-3.0.html  GNU GPL v3
  */
 
@@ -18,7 +18,10 @@ if (isset($_POST['timecredit'])) {
         if ($info['timecredit'] === null) {
             $sql = sprintf("INSERT INTO %s VALUES (%d, %d, %s)", $timetable, $id, $timecredit, db_param());
         } else {
-            $sql = sprintf("UPDATE %s SET timecredit = %d, description = %s WHERE project_id = %d", $timetable, $timecredit, db_param(), $id);
+            $sql = sprintf(
+                "UPDATE %s SET timecredit = %d, description = %s WHERE project_id = %d",
+                $timetable, $timecredit, db_param(), $id
+            );
         }
         db_query($sql, [$description]);
         \timeaccount\addSessionMessage('success', "La modification du crédit de temps a été enregistrée.");
