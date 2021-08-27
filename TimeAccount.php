@@ -19,9 +19,9 @@ class TimeAccountPlugin extends MantisPlugin
         $this->description = "Plugin that reports the allocated time and the used time.";
         $this->page = 'status';
 
-        $this->version = '1.0';
+        $this->version = '2.0';
         $this->requires = [
-            'MantisCore' => '1.3.0, < 2.0',
+            'MantisCore' => '2.0',
         ];
 
         $this->author = 'François Gannaz / Silecs';
@@ -56,19 +56,26 @@ class TimeAccountPlugin extends MantisPlugin
     public function hooks()
     {
         return [
-            'EVENT_MENU_SUMMARY' => 'onMenuSummary',
+            'EVENT_MENU_MAIN_FILTER' => 'onMenuMain',
         ];
     }
 
     /**
-     * Add entries to the menu on the page "Summary".
+     * Add entries to the menu on the page "Billing".
      *
      * @return array
      */
-    public function onMenuSummary()
+    public function onMenuMain($eventName, $data)
     {
-        return [
-            '<a href="' . plugin_page('status') . '">Temps</a>',
-        ];
+        //var_dump($data);
+        if ($eventName !== 'EVENT_MENU_MAIN_FILTER') {
+            return $data;
+        }
+        foreach ($data as $i => $d) {
+            if ($d['url'] === 'billing_page.php') {
+                $data[$i]['url'] = 'plugin.php?page=TimeAccount/status';
+            }
+        }
+        return [$data];
     }
 }

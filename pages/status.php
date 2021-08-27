@@ -12,7 +12,8 @@ $timerows = \timeaccount\readProjectsTime($projectId);
 $info = \timeaccount\readNameDescription($projectId);
 $flashMessages = \timeaccount\readSessionMessages();
 
-html_page_top();
+layout_page_header("Décompte du temps");
+layout_page_begin();
 
 if ($flashMessages) {
     echo '<div class="flash-messages well">';
@@ -111,4 +112,4 @@ if (isset($info['id']) && timeaccount\canCreditTime($info['id'])) {
 ?>
 
 <?php
-html_page_bottom();
+layout_page_end();
