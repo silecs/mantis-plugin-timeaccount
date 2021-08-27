@@ -30,86 +30,114 @@ if ($flashMessages) {
     Décompte du temps
 </h1>
 
-<div id="time-per-project" class="summary-container">
-    <h2>Crédits de temps</h2>
-    <table>
-        <thead>
-            <tr class="row-category">
-                <th>Projet</th>
-                <th>Temps consacré</th>
-                <th>Temps prépayé</th>
-                <th>Reste</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            foreach ($timerows as $row) {
-                echo "<tr>";
-                echo "<td>" . htmlspecialchars($row['name']) . "</td>";
-                echo "<td>" . db_minutes_to_hhmm($row['timeused']) . "</td>";
-                echo "<td>" . db_minutes_to_hhmm($row['timecredit']) . "</td>";
-                $remains = $row['timecredit'] - $row['timeused'];
-                if ($remains < 0) {
-                    $remains = 0;
+<div class="col-md-12 col-xs-12">
+
+<div id="time-per-project" class="widget-box widget-color-blue2">
+    <div class="widget-header widget-header-small">
+        <h2 class="widget-title lighter">
+            <?php print_icon( 'fa-clock-o', 'ace-icon' ); ?>
+            Crédits de temps
+        </h2>
+    </div>
+    <div class="widget-body widget-main">
+        <table class="table table-bordered table-condensed table-hover table-striped" style="max-width: 100ex">
+            <thead>
+                <tr class="row-category">
+                    <th>Projet</th>
+                    <th class="text-right">Temps consacré</th>
+                    <th class="text-right">Temps prépayé</th>
+                    <th class="text-right">Reste</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                foreach ($timerows as $row) {
+                    if ((int) $row['timecredit'] === 0 && (int) $row['timeused'] === 0) {
+                        continue;
+                    }
+                    echo "<tr>";
+                    echo "<td>" . htmlspecialchars($row['name']) . "</td>";
+                    echo '<td class="text-right">' . db_minutes_to_hhmm($row['timeused']) . "</td>";
+                    echo '<td class="text-right">' . ($row['timecredit'] > 0 ? db_minutes_to_hhmm($row['timecredit']) : "") . "</td>";
+                    if ($row['timecredit'] > 0) {
+                        $remains = $row['timecredit'] - $row['timeused'];
+                        if ($remains > 0) {
+                            $remains = db_minutes_to_hhmm($remains);
+                        } else {
+                            $remains = "<strong>− " . db_minutes_to_hhmm(-1*$remains) . "</strong>";
+                        }
+                    } else {
+                        $remains = '';
+                    }
+                    echo '<td class="text-right">' . $remains . "</td>";
+                    echo "</tr>\n";
                 }
-                echo "<td>" . db_minutes_to_hhmm($remains) . "</td>";
-                echo "</tr>\n";
-            }
-            ?>
-        </tbody>
-    </table>
-    <p>
-        Les durées sont exprimées sous la forme <em>hh:mm</em> (heures et minutes).
-    </p>
+                ?>
+            </tbody>
+        </table>
+        <p>
+            Les durées sont exprimées sous la forme <em>hh:mm</em> (heures et minutes).
+        </p>
+
+        <?php
+        if (isset($info['description'])) {
+            echo "<hr /><h3>Détails pour ce projet</h3>";
+            echo '<div id="project-info">'
+            . nl2br($info['description']) // no filter, but on purpose!
+            . "</div>\n";
+        }
+        ?>
+    </div>
+    <div class="widget-toolbox padding-8 clearfix">
+        <p>
+            Tickets concernés : page de <a href="/billing_page.php">suivi du temps par tickets</a> (liste de tickets sur une période avec leur décompte en temps)
+        </p>
+    </div>
 </div>
 
-<?php
-if (isset($info['description'])) {
-    echo "<h2>Détails</h2>";
-    echo '<div id="project-info">'
-    . nl2br($info['description']) // no filter, but on purpose!
-    . "</div>\n";
-}
-?>
-
-<?php
-if (isset($info['id']) && timeaccount\canCreditTime($info['id'])) {
-    $credit = ($info['timecredit'] ? db_minutes_to_hhmm($info['timecredit']) : '');
-    ?>
-    <h2>Administation du crédit de temps</h2>
-    <div class="form-container">
-        <form method="post" action="<?= plugin_page('update-project') ?>">
-            <fieldset>
-                <legend><?= htmlspecialchars($info['name']) ?></legend>
-
-                <input type="hidden" name="project_id" value="<?= $info['id'] ?>" />
-
-                <div class="field-container">
-                    <label><span>Crédit de temps</span></label>
-                    <span class="input">
-                        <input type="text" name="timecredit" value="<?= $credit ?>" />
-                        (hh:mm ou hh.h)
-                    </span>
-                    <span class="label-style"></span>
-                </div>
-
-                <div class="field-container">
-                    <label><span>Commentaire public</span><br />(HTML brut + nl2br)</label>
-                    <span class="input">
-                        <textarea cols="74" rows="12" name="description"><?= htmlspecialchars($info['description']) ?></textarea>
-                    </span>
-                    <span class="label-style"></span>
-                </div>
-
-                <span class="submit-button">
-                    <button type="submit" class="button">Enregistrer</button>
-                </span>
-            </fieldset>
-        </form>
+<div class="widget-box widget-color-blue2">
+    <div class="widget-header widget-header-small">
+        <h2 class="widget-title lighter">
+            <?php print_icon( 'fa-clock-o', 'ace-icon' ); ?>
+            Administration du crédit de temps
+        </h2>
     </div>
-    <?php
-}
-?>
+    <div class="widget-body widget-main">
+        <h3><?= htmlspecialchars($info['name']) ?></h3>
+        <?php
+        if (isset($info['id']) && timeaccount\canCreditTime($info['id'])) {
+            $credit = ($info['timecredit'] ? db_minutes_to_hhmm($info['timecredit']) : '');
+            ?>
+            <div class="form-container">
+                <form method="post" action="<?= plugin_page('update-project') ?>" class="form-horizontal">
+                    <input type="hidden" name="project_id" value="<?= $info['id'] ?>" />
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Crédit de temps</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="timecredit" value="<?= $credit ?>" />
+                            (hh:mm ou hh.h)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Commentaire public<br />(HTML brut + retours lignes conservés)</label>
+                        <div class="col-sm-10">
+                            <textarea cols="74" rows="12" name="description"><?= htmlspecialchars($info['description']) ?></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="submit" class="btn btn-default">Enregistrer</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <?php
+        }
+        ?>
+    </div>
+
+</div>
+</div>
 
 <?php
 layout_page_end();
