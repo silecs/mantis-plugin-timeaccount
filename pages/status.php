@@ -5,9 +5,11 @@
 
 require_once dirname(__DIR__) . '/includes/lib.php';
 
-access_ensure_project_level(config_get('view_summary_threshold'));
+access_ensure_project_level(config_get('time_tracking_view_threshold'));
 
 $projectId = helper_get_current_project();
+$userLevel = user_get_access_level(auth_get_current_user_id(), $projectId);
+
 $timerows = \timeaccount\readProjectsTime($projectId);
 $info = \timeaccount\readNameDescription($projectId);
 $flashMessages = \timeaccount\readSessionMessages();
@@ -88,13 +90,16 @@ if ($flashMessages) {
         }
         ?>
     </div>
+	<?php if (access_compare_level($userLevel, config_get('time_tracking_reporting_threshold'))) { ?>
     <div class="widget-toolbox padding-8 clearfix">
         <p>
             Tickets concernés : page de <a href="/billing_page.php">suivi du temps par tickets</a> (liste de tickets sur une période avec leur décompte en temps)
         </p>
     </div>
+	<?php } ?>
 </div>
 
+<?php if ($projectId > 0 && access_compare_level($userLevel, config_get('time_tracking_edit_threshold'))) { ?>
 <div class="widget-box widget-color-blue2">
     <div class="widget-header widget-header-small">
         <h2 class="widget-title lighter">
@@ -135,8 +140,9 @@ if ($flashMessages) {
         }
         ?>
     </div>
-
 </div>
+<?php } ?>
+
 </div>
 
 <?php
