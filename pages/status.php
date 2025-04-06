@@ -32,6 +32,22 @@ if ($flashMessages) {
     Décompte du temps
 </h1>
 
+<div>
+    Voir aussi :
+    <ul>
+        <li>
+            Le décompte par catégorie ou par développeur est sur une <a href="/plugin.php?page=TimeReporting/report">page de résumé</a>,
+            avec la possibilité de filtrer par période.
+        </li>
+        <?php if (access_has_project_level(config_get('time_tracking_reporting_threshold'))) { ?>
+        <li>
+            Le temps consommé par chaque ticket peut être listé sur la page de <a href="/billing_page.php">suivi du temps par tickets</a>.
+            La page liste les tickets actifs sur une période, avec leur décompte en temps.
+        </li>
+        <?php } ?>
+    </ul>
+</div>
+
 <div class="col-md-12 col-xs-12">
 
 <div id="time-per-project" class="widget-box widget-color-blue2">
@@ -90,13 +106,6 @@ if ($flashMessages) {
         }
         ?>
     </div>
-	<?php if (access_compare_level($userLevel, config_get('time_tracking_reporting_threshold'))) { ?>
-    <div class="widget-toolbox padding-8 clearfix">
-        <p>
-            Tickets concernés : page de <a href="/billing_page.php">suivi du temps par tickets</a> (liste de tickets sur une période avec leur décompte en temps)
-        </p>
-    </div>
-	<?php } ?>
 </div>
 
 <?php if ($projectId > 0 && access_compare_level($userLevel, config_get('time_tracking_edit_threshold'))) { ?>
