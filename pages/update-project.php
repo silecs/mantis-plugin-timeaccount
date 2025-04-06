@@ -9,8 +9,8 @@ access_ensure_project_level(config_get('manage_project_threshold'));
 
 if (isset($_POST['timecredit'])) {
     $id = (int) $_POST['project_id'];
-    $timecredit = timeaccount\convertHhmmToMinutes($_POST['timecredit']);
-    $description = $_POST['description'];
+    $timecredit = timeaccount\convertHhmmToMinutes((string) $_POST['timecredit']);
+    $description = (string) $_POST['description'];
 
     if (timeaccount\canCreditTime($id)) {
         $info = \timeaccount\readNameDescription($id);

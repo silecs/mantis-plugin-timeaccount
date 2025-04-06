@@ -37,8 +37,8 @@ class TimeAccountPlugin extends MantisPlugin
         return [
             [
                 'CreateTableSQL', // function name
-				[
-					// function parameters
+                [
+                    // function parameters
                     plugin_table('project'),
                     "project_id INT UNSIGNED NOT NULL PRIMARY, "
                     . "timecredit INT UNSIGNED NOT NULL DEFAULT 0, "
@@ -68,20 +68,20 @@ class TimeAccountPlugin extends MantisPlugin
         if ($eventName !== 'EVENT_MENU_MAIN_FILTER') {
             return $data;
         }
-		// If a billing menu item exists, overwrite it.
+        // If a billing menu item exists, overwrite it.
         foreach ($data as $i => $d) {
             if ($d['url'] === 'billing_page.php') {
                 $data[$i]['url'] = 'plugin.php?page=TimeAccount/status';
-				return [$data];
+                return [$data];
             }
         }
-		// Else add the menu item.
-		$data[] = [
-			'title' => "Suivi du temps",
-			'access_level' => config_get('time_tracking_view_threshold'),
-			'icon' => 'fa-clock-o',
-			'url' => 'plugin.php?page=TimeAccount/status',
-		];
+        // Else add the menu item.
+        $data[] = [
+            'title' => "Suivi du temps",
+            'access_level' => config_get('time_tracking_view_threshold'),
+            'icon' => 'fa-clock-o',
+            'url' => 'plugin.php?page=TimeAccount/status',
+        ];
         return [$data];
     }
 }

@@ -7,11 +7,8 @@ namespace timeaccount;
 
 /**
  * Array of id, name, parent_id, timeused, tt.timecredit
- *
- * @param int $projectId
- * @return IteratorAggregate
  */
-function readProjectsTime($projectId)
+function readProjectsTime(int $projectId): \IteratorAggregate
 {
     if (empty($projectId) || $projectId == ALL_PROJECTS) {
         $projects = current_user_get_accessible_projects();
@@ -21,26 +18,25 @@ function readProjectsTime($projectId)
     $ids = join(',', $projects);
 
     $timetable = plugin_table('project');
-    $sql = "SELECT p.id, p.name, ph.parent_id, SUM(bn.time_tracking) AS timeused, tt.timecredit
-            FROM {project} p
-            LEFT JOIN {project_hierarchy} ph ON p.id = ph.child_id
-            LEFT JOIN {bug} b ON b.project_id = p.id
-            LEFT JOIN {bugnote} bn ON bn.bug_id = b.id
-            LEFT JOIN $timetable tt ON tt.project_id = p.id
-            WHERE p.id IN ($ids)
-            GROUP BY p.id
-            ORDER BY p.name";
+    $sql = <<<SQL
+        SELECT p.id, p.name, ph.parent_id, SUM(bn.time_tracking) AS timeused, tt.timecredit
+        FROM {project} p
+        LEFT JOIN {project_hierarchy} ph ON p.id = ph.child_id
+        LEFT JOIN {bug} b ON b.project_id = p.id
+        LEFT JOIN {bugnote} bn ON bn.bug_id = b.id
+        LEFT JOIN $timetable tt ON tt.project_id = p.id
+        WHERE p.id IN ($ids)
+        GROUP BY p.id
+        ORDER BY p.name
+        SQL;
 
     return db_query($sql);
 }
 
 /**
  * Array of id, name, timecredit, description
- *
- * @param int $projectId
- * @return array
  */
-function readNameDescription($projectId)
+function readNameDescription(int $projectId): array
 {
     if (empty($projectId) || $projectId == ALL_PROJECTS) {
         return null;
@@ -63,38 +59,29 @@ function readNameDescription($projectId)
 
 /**
  * If the parameter contains no ':', then it implies a suffix ':00'.
- *
- * @param string $hhmm
- * @return integer
  */
-function convertHhmmToMinutes($hhmm)
+function convertHhmmToMinutes(string $hhmm): int
 {
     $m = [];
     if (ctype_digit($hhmm)) {
         return 60 * ((int) $hhmm);
-    } else if (preg_match('/^(\d+):(\d\d?)$/', $hhmm, $m)) {
-        return $m[1] * 60 + $m[2];
-    } else if (preg_match('/^(\d+\.\d\d?)$/', $hhmm, $m)) {
-        return (int) (((float) $m[1]) * 60);
-    } else {
-        // invalid format
-        return 0;
     }
+    if (preg_match('/^(\d+):(\d\d?)$/', $hhmm, $m)) {
+        return $m[1] * 60 + $m[2];
+    }
+    if (preg_match('/^(\d+\.\d\d?)$/', $hhmm, $m)) {
+        return (int) (((float) $m[1]) * 60);
+    }
+    // invalid format
+    return 0;
 }
 
-/**
- * @param integer $projectId
- * @return boolean
- */
-function canCreditTime($projectId)
+function canCreditTime(int $projectId): bool
 {
     return access_has_project_level(config_get('manage_project_threshold'), (int) $projectId);
 }
 
-/**
- * @return boolean
- */
-function addSessionMessage($category, $message)
+function addSessionMessage(string $category, string $message): bool
 {
     if (!isset($_SESSION['timeaccount_messages'])) {
         $_SESSION['timeaccount_messages'] = [];
@@ -106,10 +93,7 @@ function addSessionMessage($category, $message)
     return true;
 }
 
-/**
- * @return array
- */
-function readSessionMessages()
+function readSessionMessages(): array
 {
     if (isset($_SESSION['timeaccount_messages'])) {
         $messages = $_SESSION['timeaccount_messages'];
